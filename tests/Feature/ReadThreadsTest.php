@@ -11,13 +11,13 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class ReadThreadsTest extends TestCase
 {
     use DatabaseMigrations;
-    
+
     public function setUp()
     {
         parent::setUp();
         $this->thread = factory('App\Thread')->create();
     }
-    
+
     /** @test **/
     public function a_user_can_view_all_threads()
     {
