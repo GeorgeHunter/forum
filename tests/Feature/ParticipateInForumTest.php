@@ -13,9 +13,12 @@ class ParticipateInForumTest extends TestCase
     
     public function test_an_unauthenticated_user_cannot_add_replies()
     {
-        $this->expectException('Illuminate\Auth\AuthenticationException');
-
-        $this->post('/threads/1/replies', []);
+        $this->withExceptionHandling()
+            ->post('threads/some-channel/1/replies', [])
+            ->assertRedirect('/login');
+//        $this->expectException('Illuminate\Auth\AuthenticationException');
+//
+//        $this->post('/threads/some-channel/1/replies', []);
 
     }
     
@@ -26,14 +29,28 @@ class ParticipateInForumTest extends TestCase
      */
     public function test_an_authenticated_user_may_participate_in_forum_threads()
     {
-        $this->be($user = factory('App\User')->create());
+        $this->be($user = create('App\User'));
 //        $user = factory('App\User')->create();
-        $thread = factory('App\Thread')->create();
+        $thread = create('App\Thread');
 
-        $reply = factory('App\Reply')->make();
-        $this->post('/threads/'.$thread->id.'/replies', $reply->toArray());
+        $reply = make('App\Reply');
+        $this->post($thread->path() . '/replies', $reply->toArray());
 
-        $this->get('/threads/' . $thread->id )
+        $this->get($thread->path() )
             ->assertSee($reply->body);
     }
+
+    /** @test */
+    public function a_reply_body_is_required()
+    {
+        $this->withExceptionHandling()->signIn();
+
+        $thread = create('App\Thread');
+        $reply = make('App\Reply', ['body' => null]);
+
+        $this->post($thread->path() . '/replies', $reply->toArray())
+            ->assertSessionHasErrors('body');
+
+    }
+
 }
