@@ -27,3 +27,4 @@ Route::get('threads/create', 'ThreadController@create');
 Route::get('threads/{channel}', 'ThreadController@index');
 Route::get('threads/{channel}/{thread}', 'ThreadController@show');
 Route::post('threads', 'ThreadController@store');
+Route::post('/replies/{reply}/favourite', 'FavouriteController@store');

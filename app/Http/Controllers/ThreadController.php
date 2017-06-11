@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Channel;
 use App\Thread;
+use App\Filters\ThreadFilters;
+use App\User;
 use Illuminate\Http\Request;
 
 /**
@@ -23,13 +25,14 @@ class ThreadController extends Controller
      * @return \Illuminate\Http\Response
      * @param $channel
      */
-    public function index(Channel $channel)
+    public function index(Channel $channel, ThreadFilters $filters)
     {
-        if ($channel->exists) {
-            $threads = $channel->threads()->latest()->get();
-        } else {
-            $threads = Thread::latest()->get();
+        $threads = $this->getThreads($channel, $filters);
+
+        if (request()->wantsJson()) {
+            return $threads;
         }
+
         return view('threads.index', compact('threads'));
     }
 
@@ -64,7 +67,7 @@ class ThreadController extends Controller
             'body' => request('body')
         ]);
 
-        return redirect("threads/$thread->id");
+        return redirect($thread->path());
     }
 
     /**
@@ -75,7 +78,11 @@ class ThreadController extends Controller
      */
     public function show($channelId, Thread $thread)
     {
-        return view('threads.show', compact('thread'));
+//        return $thread;
+        return view('threads.show', [
+            'thread' => $thread,
+            'replies' => $thread->replies()->paginate(20)
+        ]);
     }
 
     /**
@@ -110,5 +117,22 @@ class ThreadController extends Controller
     public function destroy(Thread $thread)
     {
         //
+    }
+
+    /**
+     * @param Channel $channel
+     * @param ThreadFilters $filters
+     * @return mixed
+     */
+    protected function getThreads(Channel $channel, ThreadFilters $filters)
+    {
+        $threads = Thread::latest()->filter($filters);
+
+        if ($channel->exists) {
+            $threads->where('channel_id', $channel->id);
+        }
+
+        $threads = $threads->get();
+        return $threads;
     }
 }
