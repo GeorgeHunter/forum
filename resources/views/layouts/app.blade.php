@@ -32,6 +32,8 @@
         @include('layouts.partials.nav')
 
         @yield('content')
+
+        <flash></flash>
     </div>
 
     <!-- Scripts -->

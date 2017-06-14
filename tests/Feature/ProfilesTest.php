@@ -20,10 +20,11 @@ class ProfilesTest extends TestCase
 
     public function test_a_users_profile_shows_all_their_threads()
     {
-         $user = create('App\User');
-         $thread = create('App\Thread', ['user_id' => $user->id]);
+        $this->signIn();
 
-         $this->get("users/$user->name")
+         $thread = create('App\Thread', ['user_id' => auth()->id()]);
+
+         $this->get("users/" . auth()->user()->name)
              ->assertSee($thread->title);
     }
 }
