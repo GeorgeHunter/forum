@@ -10,7 +10,9 @@
         </div>
     </div>
 
-    <div class="panel-body">
-        {{ $body }}
-    </div>
+    @if (!empty($body))
+        <div class="panel-body">
+            {{ $body }}
+        </div>
+    @endif
 </div>

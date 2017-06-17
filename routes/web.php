@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/threads');
 });
 
 Auth::routes();
@@ -20,6 +20,8 @@ Auth::routes();
 Route::get('/home', function() { return view('home'); } );
 
 Route::post('/threads/{channel}/{thread}/replies', 'ReplyController@store');
+Route::delete('replies/{reply}', 'ReplyController@destroy');
+Route::patch('replies/{reply}', 'ReplyController@update');
 
 //Route::resource('threads', 'ThreadController');
 Route::get('threads', 'ThreadController@index');
